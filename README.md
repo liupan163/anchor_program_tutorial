@@ -33,3 +33,19 @@ anchor keys sync
 
 - solana-keygen pubkey target/deploy/anchor_demo-keypair.json
 - solana balance $(solana-keygen pubkey target/deploy/anchor_demo-keypair.json) --url mainnet-beta
+
+
+### Rent
+
+- solana rent <字节数>
+- [anchor Rent](https://docs.rs/solana-program/latest/solana_program/rent/index.html)
+    - `use anchor_lang::solana_program::rent as rent_module;`
+        - `rent_module::ACCOUNT_STORAGE_OVERHEAD`
+        - `rent_module::DEFAULT_LAMPORTS_PER_BYTE_YEAR`
+        - `rent_module::DEFAULT_EXEMPTION_THRESHOLD`
+
+### 查看账户大小
+
+- `realloc::zero = false`
+- solana address
+- solana account 地址
