@@ -26,6 +26,8 @@ anchor keys sync
 ## 测试
 
 - anchor clean
+- anchor run test
+    - anchor run test_create
 - anchor test --skip-local-validator
     - anchor test --skip-local-validator --skip-deploy
 
@@ -33,7 +35,6 @@ anchor keys sync
 
 - solana-keygen pubkey target/deploy/anchor_demo-keypair.json
 - solana balance $(solana-keygen pubkey target/deploy/anchor_demo-keypair.json) --url mainnet-beta
-
 
 ### Rent
 
@@ -49,3 +50,7 @@ anchor keys sync
 - `realloc::zero = false`
 - solana address
 - solana account 地址
+
+## log
+
+- solana logs | grep "address"

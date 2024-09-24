@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("6Ps266QnytvWzjEHttuhtGUHwKFDp98xvj8oqFHo5V3x");
+declare_id!("2vrz1hEC3HpVxPNXACwy4oMbVqPEw8sA34UYr6KLwQpL");
 
 // HQiNbppppSq2HEaXDjfnBHbmmmnbho3mjCvn5FEEsTdr
 // 6Ps266QnytvWzjEHttuhtGUHwKFDp98xvj8oqFHo5V3x
