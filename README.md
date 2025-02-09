@@ -1,8 +1,8 @@
-## 版本 锁定
+## Lock Dependency Version
 
 - 第一步，锁定核心工具版本。 避免奇怪case
 
-### rust 版本
+### rust Version
 
 - rustup toolchain list
 - rustc --version
@@ -15,22 +15,22 @@
 - check the version of rustc from Solana Tools, run:
     - `https://solana.stackexchange.com/questions/7077/anchor-build-says-cannot-be-built-because-it-requires-rustc-1-68-0-or-newer-bu`
 
-### solana 版本
+### solana Version
 
 - solana -V
 - sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
 - sh -c "$(curl -sSfL https://release.solana.com/v1.17.0/install)"
 
 ```
-    报错：package solana-program v1.18.17 cannot be built because it requires rustc 1.75.0 or newer, 
+    Error：package solana-program v1.18.17 cannot be built because it requires rustc 1.75.0 or newer, 
     while the currently active rustc version is 1.68.0-dev Either upgrade to rustc
-    原因： Anchor detecting wrong Rust version
+    Reason： Anchor detecting wrong Rust version
 ```
 
 - solana-install init 1.18.25
 - solana-install init 1.17.34
 
-### anchor & AVM 版本
+### anchor & AVM Version
 
 - anchor --version
 - anchor-cli 0.30.1
@@ -44,15 +44,15 @@
     - use the toolchain
     - rustup default 1.78.0
 
-## 网络 调整
+## Env NetType
 
 - Local Env ->  Live Cluster
-    - 两个需要调整：
+    - 2 changes：
         - 1 solana config set --url localhost
         - 1 solana config set --url devnet
         - 2 Anchor.toml Devnet
 
-## Local 运行 验证节点
+## Local run Validator
 
 - rm -rf test-ledger
 - solana-test-validator
@@ -65,33 +65,33 @@
    GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL authority.json
 ```
 
-### fork 合约Program 到本地
+### fork Program to LocalEnv
 
 - `solana program dump -u m metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s metadata.so`
 
-### fork 账户Account 到本地
+### fork AccountInfo to LocalEnv
 
 - `solana account -u m D4FPEruKEHrG5TenZ2mpDGEfu1iUvTiqBxvpU8HLBvC2 --output-file amm_config.json --output json-compact`
 
-### 空投
+### Airdrop to AccountBalance
 
 - solana airdrop 100 {YOUR_WALLET_ADDRESS}
 - solana airdrop 100 GTx4x6mqoNydgvVUvHfhenTCoCyhdKZ9gzYtY4zRMLzf
 
 ## Anchor
 
-### 编译build & 部署deploy
+### build & deploy
 
 - anchor build -p mint_program
 - anchor deploy -p mint_program
 
-### 同步 program_id 与 Anchor密钥
+### SYNC: program_id * AnchorPrivateKey
 
 - anchor keys list
 - anchor keys sync
     - 参考文件位置： `.config/solana/id.json`
 
-### 测试
+### Test
 
 - anchor clean
 - anchor run test
@@ -102,7 +102,7 @@
 - solana-keygen pubkey target/deploy/anchor_demo-keypair.json
 - solana balance $(solana-keygen pubkey target/deploy/anchor_demo-keypair.json) --url mainnet-beta
 
-### 查看账户大小
+### Check Account Size
 
 - `realloc::zero = false`
 - solana address
@@ -116,9 +116,9 @@
 - spl-token account-info --address ATAddress
 - spl-token balance --address ATAddress
 
-### CommonIssue 账户太小
+### Common Issue
 
-- Case: "account data too small for instruction"
+- Case: "account data too small for instruction" 账户太小
     - solana program extend <PROGRAM_ID> <MORE_BYTES>
     - `solana program extend 6cZ1ohJeqa9NfG3kBJuScUgAuociq4dxFyztvhoM4A9a 20000`
     - `RESP: Extended Program Id 6cZ1ohJeqa9NfG3kBJuScUgAuociq4dxFyztvhoM4A9a by 20000 bytes`
@@ -137,7 +137,7 @@
 
 ## Other Issue 其他遇到过的问题
 
-### 引入 其他crate
+### Import other crate
 
 - `cargo add mpl-token-metadata@1.13.1 --package mint_program`
 
