@@ -68,7 +68,7 @@ pub struct CommissionSOLProxySwapAccounts<'info> {
 }
 
 pub fn commission_sol_proxy_swap_handler<'info>(
-    ctx: Context<CommissionSOLProxySwapAccounts<'info>>,
+    ctx: Context<'_, '_, 'info, 'info, CommissionSOLProxySwapAccounts<'info>>,
     args: SwapArgs,
     commission_rate: u16,
     commission_direction: bool,
@@ -104,23 +104,21 @@ pub fn commission_sol_proxy_swap_handler<'info>(
     }
 
     // Proxy Swap
-    // let amount_out = proxy_swap_process(
-    //     &ctx.accounts.payer,
-    //     &ctx.accounts.sa_authority,
-    //     &mut *ctx.accounts.source_token_account,
-    //     &mut *ctx.accounts.destination_token_account,
-    //     &mut ctx.accounts.source_token_sa,
-    //     &mut ctx.accounts.destination_token_sa,
-    //     &ctx.accounts.source_mint,
-    //     &ctx.accounts.destination_mint,
-    //     &ctx.accounts.source_token_program,
-    //     &ctx.accounts.destination_token_program,
-    //     ctx.remaining_accounts,
-    //     args,
-    //     order_id,
-    // )?;
-
-    let amount_out = 100u64; // todo remove Mock Data
+    let amount_out = proxy_swap_process(
+        &ctx.accounts.payer,
+        &ctx.accounts.sa_authority,
+        &mut *ctx.accounts.source_token_account,
+        &mut *ctx.accounts.destination_token_account,
+        &mut ctx.accounts.source_token_sa,
+        &mut ctx.accounts.destination_token_sa,
+        &ctx.accounts.source_mint,
+        &ctx.accounts.destination_mint,
+        &ctx.accounts.source_token_program,
+        &ctx.accounts.destination_token_program,
+        ctx.remaining_accounts,
+        args,
+        order_id,
+    )?;
 
     // Commission for toToken
     if !commission_direction {

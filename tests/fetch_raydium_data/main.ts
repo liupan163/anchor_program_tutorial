@@ -1,11 +1,5 @@
-import {
-    PublicKey,
-    LAMPORTS_PER_SOL,
-    Transaction,
-    VersionedTransaction,
-} from '@solana/web3.js';
-import { RaydiumSwap } from './raydium-swap';
 import { CONFIG } from './config';
+import { RaydiumSwap } from './raydium-swap';
 
 async function fetch_pool_info() {
     console.log('Starting fetch_pool_info process...');

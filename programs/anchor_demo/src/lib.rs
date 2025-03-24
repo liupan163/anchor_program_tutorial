@@ -50,9 +50,9 @@ pub mod anchor_demo {
     }
 
     // example method:
-    //  to record commom methods about Program/Anchor implementation
-    pub fn commission_sol_proxy_swap<'info>(
-        ctx: Context<CommissionSOLProxySwapAccounts<'info>>,
+    pub fn commission_sol_proxy_swap<'c: 'info, 'info>(
+        // Note: lifetime may not live long enough argument requires that ...
+        ctx: Context<'_, '_, 'c, 'info, CommissionSOLProxySwapAccounts<'info>>,
         data: SwapArgs,
         commission_rate: u16,
         commission_direction: bool,

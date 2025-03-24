@@ -1,38 +1,43 @@
 ## Lock Dependency Version
 
-- 第一步，锁定核心工具版本。 避免奇怪case
+- 锁定核心工具版本。 避免奇怪case
+    - rustc -V
+    - solana -V
+    - anchor -V
+- 在Anchor.toml里, 锁定anchor、solana版本
 
 ### rust Version
 
 - rustup toolchain list
-- rustc --version
+  - rustc --version
+  - rustup toolchain uninstall <version>
 - rustup install
+- rustup override set 1.79
+  - special directory level.
 - rustup default 1.70.0
-- rustup toolchain uninstall <version>
-
-#### cargo-build-sbf --version
-
-- check the version of rustc from Solana Tools, run:
-    - `https://solana.stackexchange.com/questions/7077/anchor-build-says-cannot-be-built-because-it-requires-rustc-1-68-0-or-newer-bu`
 
 ### solana Version
 
 - solana -V
+  - list  `ls ~/.local/share/solana/install/releases/`
 - sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
 - sh -c "$(curl -sSfL https://release.solana.com/v1.17.0/install)"
+- solana-install init 1.18.25
+- solana-install init 1.17.34
 
-```
+```rust
     Error：package solana-program v1.18.17 cannot be built because it requires rustc 1.75.0 or newer, 
     while the currently active rustc version is 1.68.0-dev Either upgrade to rustc
     Reason： Anchor detecting wrong Rust version
 ```
 
-- solana-install init 1.18.25
-- solana-install init 1.17.34
-
 ### anchor & AVM Version
 
 - anchor --version
+- avm list
+- avm install 0.28.0
+- avm use 0.28.0 --local
+  - avm use 0.28.0
 - anchor-cli 0.30.1
     - cargo uninstall anchor-cli
 
@@ -47,7 +52,7 @@
 ## Env NetType
 
 - Local Env ->  Live Cluster
-    - 2 changes：
+    - Two changes：
         - 1 solana config set --url localhost
         - 1 solana config set --url devnet
         - 2 Anchor.toml Devnet
@@ -58,7 +63,7 @@
 - solana-test-validator
     - `solana-test-validator -r --bpf-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s metadata.so`
 
-```
+```rust
    solana-test-validator -r --bpf-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s metadata.so --bpf-program
    CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C cp_swap.so --account D4FPEruKEHrG5TenZ2mpDGEfu1iUvTiqBxvpU8HLBvC2
    amm_config.json --account DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8 fee_receiver.json --account
@@ -122,6 +127,8 @@
     - solana program extend <PROGRAM_ID> <MORE_BYTES>
     - `solana program extend 6cZ1ohJeqa9NfG3kBJuScUgAuociq4dxFyztvhoM4A9a 20000`
     - `RESP: Extended Program Id 6cZ1ohJeqa9NfG3kBJuScUgAuociq4dxFyztvhoM4A9a by 20000 bytes`
+- Safety checks failed: Failed to get program path
+  - https://solana.stackexchange.com/questions/14900/suddenly-getting-error-message-safety-checks-failed-failed-to-get-program-path
 
 ## log
 

@@ -100,9 +100,11 @@ function isPriorityFeeResponse(data: unknown): data is PriorityFeeResponse {
 export const CONFIG = {
   RPC_URL: process.env.QUICKNODE_URL,
   WALLET_SECRET_KEY: process.env.WALLET_SECRET_KEY,
-  BASE_MINT: 'So11111111111111111111111111111111111111112', // SOLANA mint address
+  BASE_MINT: 'AC9MciTbH5EpLgo4bT1bKWs9721fB294z72Kebnipump', // SOLANA mint address
+  // BASE_MINT: 'So11111111111111111111111111111111111111112', // SOLANA mint address
   // QUOTE_MINT: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', // BONK mint address
-  QUOTE_MINT: 'CXPLyc3EX8WySgEXLbjhuA7vy8EKQokVJYQuJm2jpump', // SENTAI mint address
+  // QUOTE_MINT: 'CXPLyc3EX8WySgEXLbjhuA7vy8EKQokVJYQuJm2jpump', // SENTAI mint address
+  QUOTE_MINT: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC mint address
   TOKEN_A_AMOUNT: 0.000001,
   EXECUTE_SWAP: true,
   USE_VERSIONED_TRANSACTION: false,

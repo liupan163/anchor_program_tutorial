@@ -4,7 +4,7 @@ pub const MOCK_OWNER: &str = "GTx4x6mqoNydgvVUvHfhenTCoCyhdKZ9gzYtY4zRMLzf";
 
 
 #[constant]
-pub const SEED_SA: &[u8] = b"okx_sa";
+pub const SEED_SA: &[u8] = b"sa";
 pub const BUMP_SA: u8 = 251;
 pub const COMMISSION_RATE_LIMIT: u16 = 300;
 pub const COMMISSION_DENOMINATOR: u64 = 10000;
@@ -23,13 +23,8 @@ pub const PUMPFUN_SELL_SELECTOR: &[u8; 8] = &[51, 230, 133, 164, 1, 127, 131, 17
 
 pub mod authority_pda {
     use anchor_lang::declare_id;
-    declare_id!("HV1KXxWFaSeriyFvXyx48FqG9BoFbfinB8njCJonqP7K");
-    // declare_id!("4DwLmWvMyWPPKa8jhmW6AZKGctUMe7GxAWrb2Wcw8ZUa"); //pre_deploy
-}
-
-pub mod okx_bridge_program {
-    use anchor_lang::declare_id;
-    declare_id!("okxBd18urPbBi2vsExxUDArzQNcju2DugV9Mt46BxYE");
+    declare_id!("So11111111111111111111111111111111111111112"); // TODO
+    // declare_id!("So11111111111111111111111111111111111111112"); //pre_deploy
 }
 
 pub mod token_program {
