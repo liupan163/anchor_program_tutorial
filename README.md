@@ -1,10 +1,9 @@
 ## Lock Dependency Version
 
-- 锁定核心工具版本。 避免奇怪case
-    - rustc -V
-    - solana -V
-    - anchor -V
-- 在Anchor.toml里, 锁定anchor、solana版本
+- rustc -V
+- solana -V
+- anchor -V
+- Anchor.toml, 锁定anchor、solana版本
 
 ### rust Version
 
@@ -24,12 +23,6 @@
 - sh -c "$(curl -sSfL https://release.solana.com/v1.17.0/install)"
 - solana-install init 1.18.25
 - solana-install init 1.17.34
-
-```rust
-    Error：package solana-program v1.18.17 cannot be built because it requires rustc 1.75.0 or newer, 
-    while the currently active rustc version is 1.68.0-dev Either upgrade to rustc
-    Reason： Anchor detecting wrong Rust version
-```
 
 ### anchor & AVM Version
 
@@ -89,6 +82,7 @@
 
 - anchor build -p mint_program
 - anchor deploy -p mint_program
+- `anchor deploy --provider.cluster mainnet -- --with-compute-unit-price 40`
 
 ### SYNC: program_id * AnchorPrivateKey
 
@@ -141,6 +135,31 @@
 ### Anchor error Code
 
 - `https://docs.rs/anchor-lang/latest/anchor_lang/error/enum.ErrorCode.html`
+
+## Program CMD
+
+- Upgrade related Accounts
+  - 保存 好两个keypair.json
+    - `target/deploy/**.json` 通常对应 合约地址
+    - 默认升级权限 地址 `~/.config/solana/id.json`
+  - `anchor deploy `
+- Close intermediate accounts 关闭中间账户
+  - `solana-keygen recover -o buffer-keypair.json ` and then input mnemonic
+  - `solana program close --url http://127.0.0.1:8899   --keypair ~/.config/solana/id.json --buffers  --config ./buffer-keypair.json`
+  - `solana program close AkmUVkvRE4ZkRoo9NonV8zA99GRjoYXUDp2s5K9eDQHm `
+    - `--recipient E8aQ18Xbr8FgKq5M7cQnuvJUwU8ZsningNLhcEDAPD8Y`
+    - `--url https://api.mainnet-beta.solana.com`
+- Transfer Authority
+  - solana program set-upgrade-authority ProgramId --keypair ~/.config/solana/id.json   --new-upgrade-authority  NewAuthority --url http://127.0.0.1:8899
+    - NOTE careful: `--skip-new-upgrade-authority-signer-check`
+- Not upgradable Program 不可升级合约
+  - `solana program deploy --final xxx.so`
+- Close Program
+  - `solana program close ProgramId --keypair ~/.config/solana/id.json --url http://127.0.0.1:8899`
+- Check Program Pubkey
+  - `solana address -k target/deploy/xxx_program-keypair.json`
+- Create New Pubkey
+  - `solana-keygen new -o ./target/deploy/your_program-keypair.json`
 
 ## Other Issue 其他遇到过的问题
 

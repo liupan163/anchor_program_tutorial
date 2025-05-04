@@ -1,3 +1,6 @@
+use anchor_lang::prelude::Pubkey;
+use indexmap::IndexMap;
+
 #[macro_export]
 macro_rules! get_struct_values {
     ($struct:expr, $($property: ident),+) => {{
@@ -104,3 +107,64 @@ macro_rules! digest_struct_hex {
         hex::encode(digest_struct!($struct)).into_bytes()
     }};
 }
+
+
+/// Type of the replicated value
+/// These are labels for values in a record that is associated with `Pubkey`
+#[derive(PartialEq, Hash, Eq, Clone, Debug)]
+pub enum CrdsValueLabel {
+    LegacyContactInfo(Pubkey),
+    SnapshotHashes(Pubkey),
+    ContactInfo(Pubkey),
+    RestartLastVotedForkSlots(Pubkey),
+    RestartHeaviestFork(Pubkey),
+}
+
+/// This structure stores some local metadata associated with the CrdsValue
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct VersionedCrdsValue {
+    /// Ordinal index indicating insert order.
+    ordinal: u64,
+    /// local time when updated
+    pub(crate) local_timestamp: u64,
+    /// None -> value upserted by GossipRoute::{LocalMessage,PullRequest}
+    /// Some(0) -> value upserted by GossipRoute::PullResponse
+    /// Some(k) if k > 0 -> value upserted by GossipRoute::PushMessage w/ k - 1 push duplicates
+    num_push_recv: Option<u8>,
+}
+
+type CrdsTable = IndexMap<CrdsValueLabel, VersionedCrdsValue>;
+/// Represents types which can be looked up from crds table given a key. e.g.
+///   CrdsValueLabel -> VersionedCrdsValue, CrdsValue, CrdsData
+///   Pubkey -> ContactInfo, LowestSlot, SnapshotHashes, ...
+pub trait CrdsEntry<'a, 'b>: Sized {
+    type Key; // Lookup key.
+    fn get_entry(table: &'a CrdsTable, key: Self::Key) -> Option<Self>;
+}
+macro_rules! impl_crds_entry (
+    // Lookup by CrdsValueLabel.
+    ($name:ident, |$entry:ident| $body:expr) => (
+        impl<'a, 'b> CrdsEntry<'a, 'b> for &'a $name {
+            type Key = &'b CrdsValueLabel;
+            fn get_entry(table:&'a CrdsTable, key: Self::Key) -> Option<Self> {
+                let $entry = table.get(key);
+                $body
+            }
+        }
+    );
+    // Lookup by Pubkey.
+    ($name:ident, $pat:pat, $expr:expr) => (
+        impl<'a, 'b> CrdsEntry<'a, 'b> for &'a $name {
+            type Key = Pubkey;
+            fn get_entry(table:&'a CrdsTable, key: Self::Key) -> Option<Self> {
+                let key = CrdsValueLabel::$name(key);
+                match table.get(&key)?.value.data() {
+                    $pat => Some($expr),
+                    _ => None,
+                }
+            }
+        }
+    );
+);
+
+// impl_crds_entry!(CrdsValue, |entry| Some(&entry?.value));

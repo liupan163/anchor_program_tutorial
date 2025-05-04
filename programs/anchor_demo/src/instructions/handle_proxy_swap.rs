@@ -1,7 +1,7 @@
 use crate::constants::*;
 use crate::error::ErrorCode;
 use crate::utils::token::transfer_sol_from_user;
-use crate::{proxy_swap_process, SwapArgs, COMMISSION_DENOMINATOR, COMMISSION_RATE_LIMIT};
+use crate::{proxy_swap_process, SwapArgs};
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
@@ -67,7 +67,7 @@ pub struct CommissionSOLProxySwapAccounts<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn commission_sol_proxy_swap_handler<'info>(
+pub fn proxy_swap_demo<'info>(
     ctx: Context<'_, '_, 'info, 'info, CommissionSOLProxySwapAccounts<'info>>,
     args: SwapArgs,
     commission_rate: u16,

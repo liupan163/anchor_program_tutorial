@@ -26,18 +26,18 @@ export function getPdaAddress(
 }
 
 export function find_ata_sync(
-  token0: PublicKey,
-  creatorPubkey: PublicKey,
-  programId: PublicKey,
+  mint: PublicKey,
+  owner: PublicKey,
+  allowOwnerOffCurve = false,
   tokenProgram: PublicKey
 ) {
   const ataPubkey = getAssociatedTokenAddressSync(
-    token0,
-    creatorPubkey,
-    false,
+    mint,
+    owner,
+    allowOwnerOffCurve,
     tokenProgram
   );
-  console.log("ataPubkey is:", ataPubkey.toBase58());
+  return ataPubkey;
 }
 
 export async function buildCreateAssociatedTokenAccountTransaction(
@@ -75,45 +75,37 @@ export async function createAssociatedSplTokenAccount(
   mintToken: anchor.web3.PublicKey,
   connection: Connection,
   payerKeypair: Keypair,
-  allowOwnerOffCurve = false,
+  allowOwnerOffCurve = false
 ) {
-  return createAssociatedTokenAccount(
+  return customizedCreateAssociatedTokenAccount(
     owner,
     mintToken,
     connection,
     payerKeypair,
-    TOKEN_PROGRAM_ID,
     allowOwnerOffCurve
   );
 }
 
-export async function createAssociatedSpl2020TokenAccount(
+export async function customizedCreateAssociatedTokenAccount(
   owner: anchor.web3.PublicKey,
   mintToken: anchor.web3.PublicKey,
   connection: Connection,
   payerKeypair: Keypair,
-  allowOwnerOffCurve = false,
+  allowOwnerOffCurve = false
 ) {
-  // 指定 Token2020 Program ID
-  return createAssociatedTokenAccount(
-    owner,
+  const tokenProgram = await getTokenProgramFromMint(mintToken, connection);
+  console.log("TokenProgram:", tokenProgram.toBase58());
+  let ataPubKey = find_ata_sync(
     mintToken,
-    connection,
-    payerKeypair,
-    TOKEN_2022_PROGRAM_ID,
-    allowOwnerOffCurve
+    owner,
+    allowOwnerOffCurve,
+    tokenProgram
   );
-}
-
-async function createAssociatedTokenAccount(
-  owner: anchor.web3.PublicKey,
-  mintToken: anchor.web3.PublicKey,
-  connection: Connection,
-  payerKeypair: Keypair,
-  tokenProgram: PublicKey,
-  allowOwnerOffCurve = false,
-) {
-  // console.log("TokenProgram:", tokenProgram.toBase58());
+  let accExist = await isAccountExist(connection, ataPubKey, false);
+  if (accExist) {
+    console.log("acc Exist is:", ataPubKey.toBase58());
+    return ataPubKey;
+  }
   const associatedTokenAccount = await getOrCreateAssociatedTokenAccount(
     connection,
     payerKeypair,
@@ -127,7 +119,6 @@ async function createAssociatedTokenAccount(
   // console.log("ataAccount:", associatedTokenAccount.address.toBase58());
   return associatedTokenAccount.address;
 }
-
 export async function createWsolTokenAccountAndSyncNative(
   owner: anchor.web3.PublicKey,
   mintToken: anchor.web3.PublicKey,
@@ -157,4 +148,29 @@ export async function createWsolTokenAccountAndSyncNative(
   let balanceResp = await connection.getTokenAccountBalance(wsolTokenAccount);
   console.log("wsol Balance:", balanceResp.value.amount);
   return wsolTokenAccount;
+}
+
+export async function getTokenProgramFromMint(
+  mintPubkey: anchor.web3.PublicKey,
+  connection: anchor.web3.Connection
+) {
+  // 获取 Mint 账户信息
+  const accountInfo = await connection.getAccountInfo(mintPubkey);
+  if (!accountInfo) {
+    throw new Error(`Mint account ${mintPubkey} not found on chain`);
+  }
+  // 提取 owner 字段
+  const mintOwner = accountInfo.owner;
+  // console.log("Mint Owner:", mintOwner.toBase58());
+
+  // 判断 TokenProgram
+  if (mintOwner.equals(TOKEN_PROGRAM_ID)) {
+    return TOKEN_PROGRAM_ID;
+  } else if (mintOwner.equals(TOKEN_2022_PROGRAM_ID)) {
+    return TOKEN_2022_PROGRAM_ID;
+  } else {
+    throw new Error(
+      `Unknown Token Program for mint ${mintPubkey}: ${mintOwner.toBase58()}`
+    );
+  }
 }

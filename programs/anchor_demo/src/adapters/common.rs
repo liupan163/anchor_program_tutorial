@@ -1,5 +1,6 @@
+use crate::constants::{authority_pda, BUMP_SA, SEED_SA, ZERO_ADDRESS};
 use crate::error::ErrorCode;
-use crate::{authority_pda, BUMP_SA, SEED_SA, ZERO_ADDRESS, HopAccounts};
+use crate::HopAccounts;
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::{
     instruction::Instruction,
@@ -74,7 +75,6 @@ pub fn invoke_process<'info, T: DexProcessor>(
     accounts_len: usize,
     proxy_swap: bool,
 ) -> Result<u64> {
-
 
     // check if pumpfun swap
     let before_destination_balance = swap_destination_account.amount;

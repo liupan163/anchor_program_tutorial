@@ -1,8 +1,9 @@
 
 use crate::adapters::raydium;
+use crate::constants::{MAX_HOPS, TOTAL_WEIGHT, ZERO_ADDRESS};
 use crate::error::ErrorCode;
 use crate::utils::token::{transfer_token_from_sa_pda, transfer_token_from_user};
-use crate::{MAX_HOPS, TOTAL_WEIGHT, ZERO_ADDRESS};
+use crate::SwapEvent;
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
 
@@ -69,14 +70,6 @@ pub struct CommissionSwapArgs {
     pub commission_direction: bool, // Commission direction: true-fromToken, false-toToken
 }
 
-#[event]
-#[derive(Debug)]
-pub struct SwapEvent {
-    pub dex: Dex,
-    pub amount_in: u64,
-    pub amount_out: u64,
-}
-
 pub fn proxy_swap_process<'info>(
     payer: &Signer<'info>,
     sa_authority: &UncheckedAccount<'info>,
@@ -119,7 +112,6 @@ pub fn proxy_swap_process<'info>(
         source_token_sa.clone()
     } else {
         source_token_account.clone()
-     
     };
 
     // 2.Smart swap

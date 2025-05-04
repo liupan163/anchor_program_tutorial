@@ -8,6 +8,47 @@ pub enum ErrorCode {
     #[msg("Only owner can call this function!")]
     NotOwner,
 
+
+    #[msg("SignedMsgOrderDoesNotExist")]
+    SignedMsgOrderDoesNotExist,
+
+    
+    #[msg("InvalidSignedMsgOrderId")]
+    InvalidSignedMsgOrderId,
+
+
+
+    #[msg("SignedMsgUserOrdersAccountFull")]
+    SignedMsgUserOrdersAccountFull,
+
+
+    #[msg("Invalid signer count")]
+    InvalidSignerCount,
+
+    #[msg("Default Error!")]
+    DefaultError,
+
+    #[msg("Unable To Load AccountLoader!")]
+    UnableToLoadAccountLoader,
+
+    #[msg("Invalid Admin!")]
+    InvalidAdmin,
+
+    #[msg("Invalid Whitelist Token!")]
+    InvalidWhitelistToken,
+
+    #[msg("Could Not DeserializeReferrer!")]
+    CouldNotDeserializeReferrer,
+
+    #[msg("ReferrerMustBeWritable!")]
+    ReferrerMustBeWritable,
+
+    #[msg("CouldNotDeserializeReferrerStats!")]
+    CouldNotDeserializeReferrerStats,
+    
+    #[msg("FailedUnwrap!")]
+    FailedUnwrap,
+
     #[msg("Too many hops")]
     TooManyHops,
 

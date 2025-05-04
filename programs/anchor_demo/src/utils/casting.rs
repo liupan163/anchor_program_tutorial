@@ -1,9 +1,10 @@
-use crate::error::{XxxResult, ErrorCode};
+use crate::error::{ErrorCode, XxxResult};
 use crate::utils::bn::U192;
 use solana_program::msg;
 use std::convert::TryInto;
 use std::panic::Location;
 
+// 类比： .into()方法
 pub trait Cast: Sized {
     #[track_caller]
     #[inline(always)]

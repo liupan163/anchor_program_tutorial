@@ -33,9 +33,12 @@ bytemuck = { version = "1.4.0", features = ["derive", "min_const_generics"] }
 arrayref = { version = "0.3.6" }
 ahash = "=0.8.6"
 solana-program = ">=1.16, <1.18"
+indexmap = "1.9.3"
 
 mpl-token-metadata = "=3.2.3"
 spl-token-2022 = "=0.9.0"
 
 chrono = "0.4"
 num-traits = "0.2"
+
+borsh = "0.10.3"

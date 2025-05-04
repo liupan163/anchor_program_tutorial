@@ -1,6 +1,7 @@
 use crate::adapters::common::{before_check, invoke_process};
+use crate::constants::{CPSWAP_SELECTOR, SWAP_SELECTOR, SWAP_V2_SELECTOR, ZERO_ADDRESS};
 use crate::error::ErrorCode;
-use crate::{raydium_clmm_program, raydium_stable_program, raydium_swap_program, raydium_cpmm_program, SWAP_SELECTOR, SWAP_V2_SELECTOR, CPSWAP_SELECTOR, ZERO_ADDRESS, HopAccounts};
+use crate::{HopAccounts};
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction};
 use anchor_spl::token::Token;
 use anchor_spl::token_interface::{Mint, Token2022, TokenAccount, TokenInterface};
@@ -363,9 +364,7 @@ pub fn swap<'a>(
     );
 
     let mut swap_accounts = RaydiumSwapAccounts::parse_accounts(remaining_accounts, *offset)?;
-    if swap_accounts.dex_program_id.key != &raydium_swap_program::id() {
-        return Err(ErrorCode::InvalidProgramId.into());
-    }
+
 
     // check hop accounts & swap authority
     let swap_source_token = swap_accounts.swap_source_token.key();
@@ -471,9 +470,6 @@ pub fn swap_stable<'a>(
     );
 
     let mut swap_accounts = RaydiumStableAccounts::parse_accounts(remaining_accounts, *offset)?;
-    if swap_accounts.dex_program_id.key != &raydium_stable_program::id() {
-        return Err(ErrorCode::InvalidProgramId.into());
-    }
 
     // check hop accounts & swap authority
     let swap_source_token = swap_accounts.swap_source_token.key();
@@ -579,9 +575,6 @@ pub fn swap_clmm<'a>(
     );
 
     let mut swap_accounts = RaydiumClmmAccounts::parse_accounts(remaining_accounts, *offset)?;
-    if swap_accounts.dex_program_id.key != &raydium_clmm_program::id() {
-        return Err(ErrorCode::InvalidProgramId.into());
-    }
 
     // check hop accounts & swap authority
     let swap_source_token = swap_accounts.swap_source_token.key();
@@ -687,9 +680,7 @@ pub fn swap_clmm_v2<'a>(
     );
 
     let mut swap_accounts = RaydiumClmmV2Accounts::parse_accounts(remaining_accounts, *offset)?;
-    if swap_accounts.dex_program_id.key != &raydium_clmm_program::id() {
-        return Err(ErrorCode::InvalidProgramId.into());
-    }
+
 
     // check hop accounts & swap authority
     let swap_source_token = swap_accounts.swap_source_token.key();
@@ -803,9 +794,6 @@ pub fn swap_cpmm<'a>(
     );
 
     let mut swap_accounts = RaydiumCpmmAccounts::parse_accounts(remaining_accounts, *offset)?;
-    if swap_accounts.dex_program_id.key != &raydium_cpmm_program::id() {
-        return Err(ErrorCode::InvalidProgramId.into());
-    }
 
     // check hop accounts & swap authority
     let swap_source_token = swap_accounts.swap_source_token.key();
