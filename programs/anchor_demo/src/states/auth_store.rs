@@ -8,9 +8,10 @@ pub struct AuthStore {
 
     pub xxx_address: Pubkey,
     pub xxx_list: [OperatorWallet; 50],
-
-    pub is_ok: u8,
     pub signer_wallet_list: [Pubkey; 10],
+    
+    // memory aligned.
+    pub is_ok: u8,
     pub signer_threshold: u8,
 }
 

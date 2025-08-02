@@ -1,10 +1,13 @@
+import * as bip39 from 'bip39';
+import { derivePath } from 'ed25519-hd-key';
+
 import * as anchor from '@coral-xyz/anchor';
 import {
   createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
   getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
-  getOrCreateAssociatedTokenAccount,
+  NATIVE_MINT,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
@@ -12,24 +15,23 @@ import {
   Connection,
   Keypair,
   PublicKey,
-  sendAndConfirmTransaction,
   SystemProgram,
-  Transaction,
+  TransactionInstruction,
 } from '@solana/web3.js';
 
 export function getPdaAddress(
   seeds: Buffer[],
   programId: PublicKey
-): {pdaAddress:PublicKey, bump:number} {
+): { pdaAddress: PublicKey; bump: number } {
   const [pdaAddress, bump] = PublicKey.findProgramAddressSync(seeds, programId);
-  return {pdaAddress, bump};
+  return { pdaAddress, bump };
 }
 
-export function find_ata_sync(
+export function getAtaSync(
   mint: PublicKey,
   owner: PublicKey,
-  allowOwnerOffCurve = false,
-  tokenProgram: PublicKey
+  tokenProgram: PublicKey,
+  allowOwnerOffCurve = false
 ) {
   const ataPubkey = getAssociatedTokenAddressSync(
     mint,
@@ -40,24 +42,10 @@ export function find_ata_sync(
   return ataPubkey;
 }
 
-export async function buildCreateAssociatedTokenAccountTransaction(
-  payer: PublicKey,
-  mint: PublicKey,
-  owner: PublicKey
-): Promise<Transaction> {
-  const associatedToken = await getAssociatedTokenAddress(mint, owner, false);
-  console.log("inside buildCreate aTA:", associatedToken.toBase58());
-  const transaction = new Transaction().add(
-    createAssociatedTokenAccountInstruction(payer, associatedToken, owner, mint)
-  );
-
-  return transaction;
-}
-
 export async function isAccountExist(
   connection: anchor.web3.Connection,
   account: anchor.web3.PublicKey,
-  isConsoleOut: boolean
+  isConsoleOut = false
 ) {
   const info = await connection.getAccountInfo(account);
   if (info == null || info.data.length == 0) {
@@ -70,84 +58,47 @@ export async function isAccountExist(
   return true;
 }
 
-export async function createAssociatedSplTokenAccount(
-  owner: anchor.web3.PublicKey,
-  mintToken: anchor.web3.PublicKey,
+export async function createWSOLTokenAccountAndSyncNativeInstructions(
   connection: Connection,
-  payerKeypair: Keypair,
+  owner: PublicKey,
+  payer: PublicKey,
+  syncAmount: bigint,
   allowOwnerOffCurve = false
-) {
-  return customizedCreateAssociatedTokenAccount(
-    owner,
-    mintToken,
+): Promise<{ ata: PublicKey; instructions: TransactionInstruction[] }> {
+  let { ata, instruction } = await createAtaIx(
     connection,
-    payerKeypair,
+    payer,
+    NATIVE_MINT,
+    owner,
     allowOwnerOffCurve
   );
-}
+  const instructions = [instruction];
 
-export async function customizedCreateAssociatedTokenAccount(
-  owner: anchor.web3.PublicKey,
-  mintToken: anchor.web3.PublicKey,
-  connection: Connection,
-  payerKeypair: Keypair,
-  allowOwnerOffCurve = false
-) {
-  const tokenProgram = await getTokenProgramFromMint(mintToken, connection);
-  console.log("TokenProgram:", tokenProgram.toBase58());
-  let ataPubKey = find_ata_sync(
-    mintToken,
-    owner,
-    allowOwnerOffCurve,
-    tokenProgram
-  );
-  let accExist = await isAccountExist(connection, ataPubKey, false);
-  if (accExist) {
-    console.log("acc Exist is:", ataPubKey.toBase58());
-    return ataPubKey;
+  let lamports;
+
+  if (instruction) {
+    lamports = BigInt(syncAmount);
+  } else {
+    let balance = await connection.getTokenAccountBalance(ata);
+    let existingBalance = BigInt(balance.value.amount ?? "0");
+    lamports = syncAmount - existingBalance;
   }
-  const associatedTokenAccount = await getOrCreateAssociatedTokenAccount(
-    connection,
-    payerKeypair,
-    mintToken,
-    owner,
-    allowOwnerOffCurve,
-    "confirmed",
-    {},
-    tokenProgram
-  );
-  // console.log("ataAccount:", associatedTokenAccount.address.toBase58());
-  return associatedTokenAccount.address;
-}
-export async function createWsolTokenAccountAndSyncNative(
-  owner: anchor.web3.PublicKey,
-  mintToken: anchor.web3.PublicKey,
-  connection: Connection,
-  payerKeypair: Keypair,
-  syncAmount: number,
-  allowOwnerOffCurve = false,
-) {
-  let wsolTokenAccount = await createAssociatedSplTokenAccount(
-    owner,
-    mintToken,
-    connection,
-    payerKeypair,
-    allowOwnerOffCurve
-  );
-  const unifiedTransaction = new Transaction().add(
-    SystemProgram.transfer({
-      fromPubkey: payerKeypair.publicKey,
-      toPubkey: wsolTokenAccount,
-      lamports: syncAmount,
-    }),
-    createSyncNativeInstruction(wsolTokenAccount)
-  );
-  await sendAndConfirmTransaction(connection, unifiedTransaction, [
-    payerKeypair,
-  ]);
-  let balanceResp = await connection.getTokenAccountBalance(wsolTokenAccount);
-  console.log("wsol Balance:", balanceResp.value.amount);
-  return wsolTokenAccount;
+  if (lamports > 0) {
+    // need transfer more SOL to WSOL
+    instructions.push(
+      SystemProgram.transfer({
+        fromPubkey: payer,
+        toPubkey: ata,
+        lamports,
+      }),
+      createSyncNativeInstruction(ata)
+    );
+  }
+
+  return {
+    ata,
+    instructions: instructions.filter(Boolean),
+  };
 }
 
 export async function getTokenProgramFromMint(
@@ -174,3 +125,63 @@ export async function getTokenProgramFromMint(
     );
   }
 }
+
+export async function createAtaIx(
+  connection: Connection,
+  payer: PublicKey, // 支付 rent + 创建费
+  targetMint: PublicKey, // 用户的 owner address
+  owner: PublicKey,
+  allowOwnerOffCurve = false
+): Promise<{
+  ata: PublicKey;
+  createAtaIx?: TransactionInstruction;
+  instruction?: TransactionInstruction;
+}> {
+  const mintTokenProgram = await getTokenProgramFromMint(
+    targetMint,
+    connection
+  );
+  const ata = await getAssociatedTokenAddress(
+    targetMint,
+    owner,
+    allowOwnerOffCurve,
+    mintTokenProgram
+  );
+  if (await isAccountExist(connection, ata, false)) {
+    // Skip createAtaIx
+    return {
+      ata,
+    };
+  }
+
+  // 构造创建 Associated Token Account 的指令（Instruction）
+  const createAtaIx = createAssociatedTokenAccountInstruction(
+    payer, // 付款人（必须 signer）
+    ata, // 目标 token account（PDA）
+    owner, // owner：此 ATA 属于谁
+    targetMint, // token mint
+    mintTokenProgram // token program
+  );
+
+  return {
+    ata,
+    createAtaIx,
+    instruction: createAtaIx,
+  };
+}
+
+export async function getKeypairFromMnemonic(mnemonic: string, derivationPath = "m/44'/501'/0'/0'"){
+  // 1. 验证助记词
+  if (!bip39.validateMnemonic(mnemonic)) {
+    throw new Error('Invalid mnemonic');
+  }
+
+  // 2. 助记词 -> seed
+  const seed = await bip39.mnemonicToSeed(mnemonic);
+
+  // 3. 派生路径（默认 m/44'/501'/0'/0' 是 Solana 标准）
+  const derivedSeed = derivePath(derivationPath, seed.toString('hex')).key;
+
+  // 4. 从派生的 seed 生成 Solana Keypair
+  return Keypair.fromSeed(derivedSeed);
+};

@@ -1,7 +1,5 @@
-use crate::error::{ErrorCode, XxxResult};
-use crate::utils::bn::U192;
-use solana_program::msg;
-use std::convert::TryInto;
+use crate::{error::{ErrorCode, XxxResult}, utils::U192};
+use anchor_lang::prelude::*;
 use std::panic::Location;
 
 // 类比： .into()方法

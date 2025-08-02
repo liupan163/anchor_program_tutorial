@@ -7,7 +7,6 @@ use crate::{
     load,
     states::{SignedMsgOrderId, SignedMsgUserOrders, User},
 };
-use solana_program::rent::Rent;
 
 #[derive(Accounts)]
 #[instruction(num_orders: u16)]
@@ -28,7 +27,7 @@ pub struct InitializeSignedMsgUserOrders<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handle_initialize_signed_msg_user_orders<'c: 'info, 'info>(
+pub fn handle_initialize_custom_size_data<'c: 'info, 'info>(
     ctx: Context<'_, '_, 'c, 'info, InitializeSignedMsgUserOrders<'info>>,
     num_orders: u16,
 ) -> Result<()> {
@@ -61,7 +60,7 @@ pub struct ResizeSignedMsgUserOrders<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handle_resize_signed_msg_user_orders<'c: 'info, 'info>(
+pub fn handle_resize_custom_size_data<'c: 'info, 'info>(
     ctx: Context<'_, '_, 'c, 'info, ResizeSignedMsgUserOrders<'info>>,
     num_orders: u16,
 ) -> Result<()> {
@@ -108,8 +107,8 @@ pub fn handle_place_and_make_signed_msg_perp_order<'c: 'info, 'info>(
 
     let order_exists = load!(ctx.accounts.user)?;
     msg!("order_exists: {:?}", order_exists);
-    let mut user = load_mut!(ctx.accounts.user)?;
-    msg!("user: {:?}", user);
+    let mut _user = load_mut!(ctx.accounts.user)?;
+    msg!("user: {:?}", _user);
 
     Ok(())
 }

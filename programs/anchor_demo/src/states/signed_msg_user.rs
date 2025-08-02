@@ -1,4 +1,5 @@
 use std::cell::{Ref, RefMut};
+use std::panic::Location;
 
 use crate::error::{XxxResult, ErrorCode};
 use crate::math::safe_unwrap::SafeUnwrap;
@@ -149,6 +150,7 @@ impl<'a> SignedMsgUserOrdersZeroCopyMut<'a> {
         uuid_exists
     }
 
+    #[track_caller]
     pub fn add_signed_msg_order_id(
         &mut self,
         signed_msg_order_id: SignedMsgOrderId,
@@ -166,7 +168,13 @@ impl<'a> SignedMsgUserOrdersZeroCopyMut<'a> {
                 return Ok(());
             }
         }
-
+        let caller = Location::caller();
+        msg!(
+            "Could not find signed_msg_order_id {:?} at {}:{}",
+            signed_msg_order_id,
+            caller.file(),
+            caller.line()
+        );
         Err(ErrorCode::SignedMsgUserOrdersAccountFull.into())
     }
 }

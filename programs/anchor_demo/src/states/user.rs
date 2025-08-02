@@ -6,7 +6,8 @@ use crate::states::traits::Size;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, AnchorSerialize, AnchorDeserialize)]
 #[repr(transparent)]
-pub struct Price(pub NonZeroI64);  // TODO： NOTE: NonZeroI64
+pub struct Price(pub i64);  // Changed from NonZeroI64 to i64 for Anchor compatibility
+// pub struct Price(pub NonZeroI64);
 
 
 impl Size for User {

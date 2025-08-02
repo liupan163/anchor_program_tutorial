@@ -1,14 +1,13 @@
 use crate::error::{ErrorCode, XxxResult};
-use crate::states::{load_ref_mut, Size, User, UserStats};
-use std::cell::RefMut;
+use crate::states::{Size, User, UserStats};
+// use std::cell::RefMut;
 use std::convert::TryFrom;
 
 use crate::math::safe_unwrap::SafeUnwrap;
 use crate::msg;
 
 use crate::validate;
-use anchor_lang::accounts::account::Account;
-use anchor_lang::prelude::{AccountInfo, Interface};
+use anchor_lang::prelude::*;
 use anchor_lang::prelude::{AccountLoader, InterfaceAccount};
 use anchor_lang::Discriminator;
 use anchor_spl::token::TokenAccount;
@@ -16,22 +15,17 @@ use anchor_spl::token_interface::{Mint, TokenInterface};
 use arrayref::array_ref;
 use solana_program::account_info::next_account_info;
 use std::iter::Peekable;
-use std::ops::Deref;
+// use std::ops::Deref;
 use std::slice::Iter;
 
-
 pub fn deref_case() -> XxxResult {
-    
     // AccountLoader.load() 转换 ->  Ref<>
     // Ref<>.deref()    转换->      Deref()
- 
+
     Ok(())
 }
 
-pub fn load_ref_mut_case(
-    oracle_account_info: AccountInfo<'_>,
-    slot: u64,
-) -> XxxResult {
+pub fn load_ref_mut_case(_oracle_account_info: AccountInfo<'_>, _slot: u64) -> XxxResult {
     // let mut oracle: RefMut<PrelaunchOracle> =
     //     load_ref_mut(&oracle_account_info).or(Err(UnableToLoadOracle))?;
 
@@ -41,7 +35,6 @@ pub fn load_ref_mut_case(
 
     Ok(())
 }
-
 
 #[allow(clippy::type_complexity)]
 pub fn get_referrer_and_referrer_stats<'a>(
@@ -116,7 +109,6 @@ pub fn get_referrer_and_referrer_stats<'a>(
 
     Ok((Some(referrer), Some(referrer_stats)))
 }
-
 
 pub fn get_whitelist_token<'a>(
     account_info_iter: &mut Peekable<Iter<'a, AccountInfo<'a>>>,

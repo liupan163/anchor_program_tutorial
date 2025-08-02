@@ -8,6 +8,8 @@ pub enum ErrorCode {
     #[msg("Only owner can call this function!")]
     NotOwner,
 
+    #[msg("InvalidAuthStore")]
+    InvalidAuthStore,
 
     #[msg("SignedMsgOrderDoesNotExist")]
     SignedMsgOrderDoesNotExist,

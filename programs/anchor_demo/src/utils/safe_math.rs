@@ -2,7 +2,7 @@ use crate::error::{XxxResult, ErrorCode};
 use crate::utils::bn::{U192, U256};
 use crate::utils::ceil_div::CheckedCeilDiv;
 use crate::utils::floor_div::CheckedFloorDiv;
-use solana_program::msg;
+use anchor_lang::prelude::*;
 use std::panic::Location;
 
 pub trait SafeMath: Sized {
